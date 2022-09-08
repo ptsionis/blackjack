@@ -2,10 +2,56 @@
     margin: 0;
     padding: 0;
     line-height: 1.5;
+    outline: 2px solid darkblue;
 }
 
 body {
     min-height: 100vh;
     min-width: 100vw;
     background-image: url('../images/background.jpg');
+    display: grid;
+    grid-template-columns: auto;
+    grid-template-rows: auto auto auto;
+}
+
+.button-container {
+    cursor: pointer;
+    width: 100%;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#dealerHand, #playerHand {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.player-actions-container {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.tokens-container {
+    height: fit-content;
+}
+
+.token-image {
+    width: 75px;
+    height: auto;
+    margin: 0em .5em;
+    cursor: pointer;
+}
+
+.card {
+    height: 250px;
+    width: auto;
+    border: 3px solid black;
+    border-radius: 25px;
 }
