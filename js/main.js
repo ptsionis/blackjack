@@ -1,7 +1,20 @@
 'use strict';
 
 const deck = [];
-shuffleDeck();
+const playerHand = document.getElementById('playerHand');
+const dealerHand = document.getElementById('dealerHand');
+const bettingContainer = document.getElementById('betting-container');
+const buttonContainer = document.getElementById('button-container');
+const playerHitBtn = document.getElementById('playerHitBtn');
+const playerStandBtn = document.getElementById('playerStandBtn');
+const playerCash = document.getElementById('player-cash');
+const playerTempBet = document.getElementById('player-bet');
+
+let dealerTurn = false; //Used to know if the popped card should go to the player or the dealer DOM container
+let tempCardSrc = '';
+let playerBet = 0;
+let confirmedBet = 0;
+
 function shuffleDeck() {
     deck.push("ac");
     deck.push("ad");
@@ -36,19 +49,20 @@ function shuffleDeck() {
     }
 }
 
-const playerHand = document.getElementById('playerHand');
-const dealerHand = document.getElementById('dealerHand');
-
 class Player {
     constructor(name, cash) {
         this.name = name;
         this.cash = cash;
         this.hand = 0;
-        this.hasAce = false;
-        this.isBusted = false;
+        this.isSoft = false;
     }
 
     hit() {
+        //If deck is empty, reshuffle it
+        if (deck.length == 0) {
+            shuffleDeck();
+        }
+
         //Create a new card element
         let newCardElement = document.createElement("img");
         newCardElement.setAttribute('class', 'card');
@@ -63,14 +77,13 @@ class Player {
         let poppedCard = deck.pop();
         newCardElement.src = './images/playing_cards_source_by_yozzo/'+poppedCard+'.svg';
         let newCardValue = poppedCard.slice(0,1);
-        if (newCardValue=='2' || newCardValue=='3' || newCardValue=='4' || newCardValue=='5' || newCardValue=='6' || newCardValue=='7' || 
-        newCardValue=='8' || newCardValue=='9') {
+        if (newCardValue=='2' || newCardValue=='3' || newCardValue=='4' || newCardValue=='5' || newCardValue=='6' || newCardValue=='7' || newCardValue=='8' || newCardValue=='9') {
             this.hand += parseInt(newCardValue);
         }
         else if (newCardValue=='a') {
             if (this.hand+11 <= 21) {
                 this.hand += 11;
-                this.hasAce = true;
+                this.isSoft = true;
             }
             else {
                 this.hand += 1;
@@ -79,39 +92,43 @@ class Player {
         else {
             this.hand += 10;
         }
-        if (this.hand > 21 && this.hasAce==true) {
-            this.hand -= 10;
-            this.hasAce = false;
-        }
 
-        //If deck is empty, reshuffle it
-        if (deck.length == 0) {
-            shuffleDeck();
+        //Make hand from soft to hard
+        if (this.hand > 21 && this.isSoft==true) {
+            this.hand -= 10;
+            this.isSoft = false;
         }
 
         //Check if player reached 21
-        console.log(this.name + " hand is: " + this.hand);
         if (this.hand == 21) {
             this.stand();
         }
 
-        //Check if player is busted
         if (this.hand > 21) {
+            //Check if dealer is busted
             if (this.name=='dealer') {
-                console.log("Demo wins");
                 player.cash += confirmedBet * 2;
-                playerCash.innerHTML = '&dollar; ' + player.cash;
+                playerCash.innerHTML = 'Cash: &dollar;' + player.cash;
             }
+            //Check if player is busted
             else {
-                console.log("Dealer wins")
+                document.getElementById('hidden').src = tempCardSrc;
+                playerHitBtn.disabled = true;
+                playerHitBtn.style.cursor = 'default';
+                playerStandBtn.disabled = true;
+                playerStandBtn.style.cursor = 'default';
             }
-            this.isBusted = true;
-            document.getElementById('hidden').src = tempCardSrc;
+            //Code to go to the next round
         }
     }
 
     stand() {
+        //If player pressed Stand, disable action buttons and let dealer play
         if (this.name!='dealer') {
+            playerHitBtn.disabled = true;
+            playerHitBtn.style.cursor = 'default';
+            playerStandBtn.disabled = true;
+            playerStandBtn.style.cursor = 'default';
             dealerPlays();
         }
     }
@@ -119,12 +136,9 @@ class Player {
 
 const player = new Player('demo', 1000);
 const dealer = new Player('dealer', 9999);
-let dealerTurn = false;
-let tempCardSrc = '';
-let playerBet = 0;
-let confirmedBet = 0;
 
 function newRound() {
+    //Clears all cards from the DOM
     while (playerHand.firstChild) {
         playerHand.removeChild(playerHand.firstChild);
     }
@@ -132,79 +146,30 @@ function newRound() {
         dealerHand.removeChild(dealerHand.firstChild);
     }
 
-    //Initialize hands
+    //Set both hands to zero and isSoft to false
     dealerTurn = false;
     player.hand = 0;
+    player.isSoft = false;
     dealer.hand = 0;
+    dealer.isSoft = false;
 
+    //If deck length is less than 4, shuffle
     if (deck.length<4) {
         shuffleDeck();
     }
 
-    function giveHand(_player) {
-        let _playerHand;
-        if (_player.name!='dealer') {
-            _playerHand = playerHand;
-        }
-        else {
-            _playerHand = dealerHand;
-        }
-        for (let i=0; i<2; i++) {
-            let newCardElement = document.createElement("img");
-            newCardElement.setAttribute('class', 'card');
-            _playerHand.appendChild(newCardElement);
-            let poppedCard = deck.pop();
-            newCardElement.src = './images/playing_cards_source_by_yozzo/'+poppedCard+'.svg';
-            let newCardValue = poppedCard.slice(0,1);
-            if (newCardValue=='2' || newCardValue=='3' || newCardValue=='4' || newCardValue=='5' || newCardValue=='6' || newCardValue=='7' || 
-            newCardValue=='8' || newCardValue=='9') {
-                _player.hand += parseInt(newCardValue);
-            }
-            else if (newCardValue=='a') {
-                if (_player.hand+11 <= 21) {
-                    _player.hand += 11;
-                    _player.hasAce = true;
-                }
-                else {
-                    _player.hand += 1;
-                }
-            }
-            else {
-                _player.hand += 10;
-            }
-            if (_player.name=='dealer' && i!=0) {
-                newCardElement.setAttribute('id', 'hidden');
-                tempCardSrc = newCardElement.src;
-                newCardElement.src = './images/back.png';
-            }
-        }
-        console.log(deck);
-    }
+    //Show betting options
+    bettingContainer.style.display = 'flex';
+    buttonContainer.style.display = 'none';
 
-    //Give player 2 cards
-    giveHand(player);
-
-    //Give dealer 2 cards
-    giveHand(dealer);
-
-    console.log(player.hand + " " + dealer.hand);
-
-    //Player got a blackjack
-    if (player.hand==21) {
-        if (dealer.hand==21) {
-            console.log("Both dealer and player bj, push");
-        }
-        else {
-            console.log('demo blackjack');
-            player.cash += (confirmBet*2 + (confirmedBet/2)*3/2);
-        }
-    }
+    //Make Hit, Stand, Double buttons clickable
+    playerHitBtn.disabled = false;
+    playerHitBtn.style.cursor = 'pointer';
+    playerStandBtn.disabled = false;
+    playerStandBtn.style.cursor = 'pointer';
 }
 
-const playerCash = document.getElementById('player-cash');
-const playerTempBet = document.getElementById('player-bet');
 function addBet(_this) {
-    console.log(_this);
     if (_this.id=='token50') {
         playerBet += 50;
     }
@@ -220,23 +185,108 @@ function addBet(_this) {
     else {
         playerBet += 1000;
     }
-    playerTempBet.innerHTML = '&dollar; ' + playerBet;
+    playerTempBet.innerHTML = 'Bet: &dollar;' + playerBet;
 }
 
 function confirmBet() {
+    //Check if tempBet is less or equal than the total cash amount of the player
     if (player.cash >= playerBet) {
         player.cash -= playerBet;
         confirmedBet = playerBet;
-        playerCash.innerHTML = '&dollar; ' + player.cash;
+        playerCash.innerHTML = 'Cash: &dollar;' + player.cash;
+        //If tempBet is less or equal than the total cash amount of the player, hide betting container, give hands and show actions container
+        bettingContainer.style.display = 'none';
+        giveHand(player);
+        giveHand(dealer);
+        buttonContainer.style.display = 'flex'
     }
     else {
-        console.log("not enough cash");
+        //Add code that says 'Cash not enough' in the DOM
     }
 }
 
 function clearBet() {
+    //Reset tempBet
     playerBet = 0;
-    playerTempBet.innerHTML = '&dollar; 0'
+    playerTempBet.innerHTML = 'Bet: &dollar;0'
+}
+
+function giveHand(_player) {
+    let _playerHand;
+    if (_player.name!='dealer') {
+        _playerHand = playerHand;
+    }
+    else {
+        _playerHand = dealerHand;
+    }
+
+    //Share 2 cards
+    for (let i=0; i<2; i++) {
+        //Create a new card element and add it to the corresponding DOM element
+        let newCardElement = document.createElement("img");
+        newCardElement.setAttribute('class', 'card');
+        _playerHand.appendChild(newCardElement);
+
+        //Pop a card from the deck and add it to the corresponding hand
+        let poppedCard = deck.pop();
+        newCardElement.src = './images/playing_cards_source_by_yozzo/'+poppedCard+'.svg';
+        let newCardValue = poppedCard.slice(0,1);
+        if (newCardValue=='2' || newCardValue=='3' || newCardValue=='4' || newCardValue=='5' || newCardValue=='6' || newCardValue=='7' || 
+        newCardValue=='8' || newCardValue=='9') {
+            _player.hand += parseInt(newCardValue);
+        }
+        else if (newCardValue=='a') {
+            if (_player.hand+11 <= 21) {
+                _player.hand += 11;
+                _player.isSoft = true;
+            }
+            else {
+                _player.hand += 1;
+            }
+        }
+        else {
+            _player.hand += 10;
+        }
+
+        //Hide dealer's second card
+        if (_player.name=='dealer' && i!=0) {
+            newCardElement.setAttribute('id', 'hidden');
+            tempCardSrc = newCardElement.src;
+            newCardElement.src = './images/back.png';
+        }
+    }
+
+    //Check if player got a blackjack
+    if (_player.name == 'dealer') {
+        if (player.hand==21) {
+            //If player got a BJ, disable action buttons, show dealer's second card
+            playerHitBtn.disabled = true;
+            playerHitBtn.style.cursor = 'default';
+            playerStandBtn.disabled = true;
+            playerStandBtn.style.cursor = 'pointer';
+            document.getElementById('hidden').src = tempCardSrc;
+
+            //Check if dealer has BJ too and add the corresponding cash on player's cash after
+            if (dealer.hand==21) {
+                player.cash += confirmedBet;
+            }
+            else {
+                player.cash += (confirmedBet*2 + (confirmedBet/2));
+            }
+            //Code to go to the next round
+        }
+        else {
+            //Check if dealer has a BJ while player does not
+            if (dealer.hand==21) {
+                document.getElementById('hidden').src = tempCardSrc;
+                playerHitBtn.disabled = true;
+                playerHitBtn.style.cursor = 'default';
+                playerStandBtn.disabled = true;
+                playerStandBtn.style.cursor = 'pointer';
+                //Code to go to the next round
+            }
+        }
+    }
 }
 
 function dealerPlays() {
@@ -247,21 +297,16 @@ function dealerPlays() {
         dealer.hit();
     }
     
-    if (!player.isBusted && !dealer.isBusted) {
-        if (player.hand < dealer.hand) {
-            console.log("Dealer wins");
-        }
-        else if (player.hand > dealer.hand) {
-            console.log("Demo wins");
-            player.cash += confirmedBet * 2;
-            playerCash.innerHTML = '&dollar; ' + player.cash;
-        }
-        else {
-            console.log("Push!");
-            player.cash += confirmedBet;
-            playerCash.innerHTML = '&dollar; ' + player.cash;
-        }
+    //Check if player's hand is bigger than dealer's hand
+    if (player.hand > dealer.hand) {
+        player.cash += confirmedBet * 2;
+        playerCash.innerHTML = 'Cash: &dollar;' + player.cash;
+    }
+    if (player.hand == dealer.hand) {
+        player.cash += confirmedBet;
+        playerCash.innerHTML = 'Cash: &dollar;' + player.cash;
     }
 }
 
-newRound();
+shuffleDeck(); //Initialize the deck for the first time
+newRound(); //Set everything up for the first time
