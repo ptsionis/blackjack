@@ -55,6 +55,10 @@ function shuffleDeck() {
     shuffleSound.play();
 }
 
+async function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 class Player {
     constructor(name, cash) {
         this.name = name;
@@ -63,7 +67,7 @@ class Player {
         this.isSoft = false;
     }
 
-    hit() {
+    async hit() {
         //If deck is empty, reshuffle it
         if (deck.length == 0) {
             shuffleDeck();
@@ -136,7 +140,7 @@ class Player {
             playerHitBtn.style.cursor = 'default';
             playerStandBtn.disabled = true;
             playerStandBtn.style.cursor = 'default';
-            dealerPlays();
+            setTimeout(dealerPlays, 1000);
         }
     }
 }
@@ -204,8 +208,8 @@ function confirmBet() {
         playerCash.innerHTML = 'Cash: &dollar;' + player.cash;
         //If tempBet is less or equal than the total cash amount of the player, hide betting container, give hands and show actions container
         bettingContainer.style.display = 'none';
-        giveHand(player);
-        giveHand(dealer);
+        setTimeout(giveHand, 500, player);
+        setTimeout(giveHand, 1250, dealer);
         buttonContainer.style.display = 'flex'
     }
     else {
@@ -220,7 +224,7 @@ function clearBet() {
     clearBetSound.play();
 }
 
-function giveHand(_player) {
+async function giveHand(_player) {
     let _playerHand;
     if (_player.name!='dealer') {
         _playerHand = playerHand;
@@ -264,8 +268,10 @@ function giveHand(_player) {
             newCardElement.src = './images/back.png';
         }
         hitCardSound.play();
+        await sleep(2000);
     }
 
+    console.log(player.hand + " " + dealer.hand);
     //Check if player got a blackjack
     if (_player.name == 'dealer') {
         if (player.hand==21) {
@@ -274,7 +280,9 @@ function giveHand(_player) {
             playerHitBtn.style.cursor = 'default';
             playerStandBtn.disabled = true;
             playerStandBtn.style.cursor = 'pointer';
+            await sleep(2000);
             document.getElementById('hidden').src = tempCardSrc;
+            hitCardSound.play();
 
             //Check if dealer has BJ too and add the corresponding cash on player's cash after
             if (dealer.hand==21) {
@@ -285,25 +293,16 @@ function giveHand(_player) {
             }
             //Code to go to the next round
         }
-        else {
-            //Check if dealer has a BJ while player does not
-            if (dealer.hand==21) {
-                document.getElementById('hidden').src = tempCardSrc;
-                playerHitBtn.disabled = true;
-                playerHitBtn.style.cursor = 'default';
-                playerStandBtn.disabled = true;
-                playerStandBtn.style.cursor = 'pointer';
-                //Code to go to the next round
-            }
-        }
     }
 }
 
-function dealerPlays() {
+async function dealerPlays() {
     dealerTurn = true;
     document.getElementById('hidden').src = tempCardSrc;
+    hitCardSound.play();
 
     while (dealer.hand<17) {
+        await sleep(2000);
         dealer.hit();
     }
     
