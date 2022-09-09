@@ -1,4 +1,4 @@
-An, unifinished, blackjack web game, to put my HTML, CSS and JavaScript skills in action.
+An, unifinished, blackjack web game, to put my HTML, CSS and JavaScript skills in action.<br>
 Problems to be fixed:
 - no Double method
 - no Split method
