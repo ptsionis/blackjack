@@ -9,8 +9,12 @@ const playerHitBtn = document.getElementById('playerHitBtn');
 const playerStandBtn = document.getElementById('playerStandBtn');
 const playerCash = document.getElementById('player-cash');
 const playerTempBet = document.getElementById('player-bet');
+const addBetSound = document.getElementById('addBetSound');
+const clearBetSound = document.getElementById('clearBetSound');
+const hitCardSound = document.getElementById('hitCardSound');
+const shuffleSound = document.getElementById('shuffleSound');
 
-let dealerTurn = false; //Used to know if the popped card should go to the player or the dealer DOM container
+let dealerTurn = false; //It's used to know if the popped card should go to the player or the dealer DOM container
 let tempCardSrc = '';
 let playerBet = 0;
 let confirmedBet = 0;
@@ -47,6 +51,8 @@ function shuffleDeck() {
         const j = Math.floor(Math.random() * (i+1));
         [deck[i], deck[j]] = [deck[j], deck[i]];
     }
+
+    shuffleSound.play();
 }
 
 class Player {
@@ -92,6 +98,7 @@ class Player {
         else {
             this.hand += 10;
         }
+        hitCardSound.play();
 
         //Make hand from soft to hard
         if (this.hand > 21 && this.isSoft==true) {
@@ -185,6 +192,7 @@ function addBet(_this) {
     else {
         playerBet += 1000;
     }
+    addBetSound.play();
     playerTempBet.innerHTML = 'Bet: &dollar;' + playerBet;
 }
 
@@ -209,6 +217,7 @@ function clearBet() {
     //Reset tempBet
     playerBet = 0;
     playerTempBet.innerHTML = 'Bet: &dollar;0'
+    clearBetSound.play();
 }
 
 function giveHand(_player) {
@@ -254,6 +263,7 @@ function giveHand(_player) {
             tempCardSrc = newCardElement.src;
             newCardElement.src = './images/back.png';
         }
+        hitCardSound.play();
     }
 
     //Check if player got a blackjack
