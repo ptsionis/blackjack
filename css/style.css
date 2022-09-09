@@ -33,6 +33,7 @@ body {
     width: auto;
     border: 3px solid black;
     border-radius: 25px;
+    box-shadow: 5px 2px 12px 1px rgba(0,0,0,.6);
 }
 
 #dealerHand, #playerHand {
@@ -93,4 +94,7 @@ body {
     height: auto;
     margin: 0em .5em;
     cursor: pointer;
+    border: 2px solid rgba(0,0,0,.6);
+    border-radius: 50px;
+    box-shadow: 3px 1px 5px 1px rgba(0,0,0,.6);
 }
