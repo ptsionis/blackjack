@@ -16,6 +16,43 @@ body {
     font-family: 'Noto Serif Georgian', serif;
 }
 
+#insurance-container {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 500px;
+    height: 300px;
+    padding: 1em;
+    border: 3px solid black;
+    border-radius: 10px;
+    background-image: url('../images/insurance.png');
+    background-size: cover;
+    background-position-y: 50%;
+    z-index: 3;
+    opacity: .9;
+}
+
+.insurance-button {
+    position: absolute;
+    top: 35%;
+    cursor: pointer;
+    width: 75px;
+    height: fit-content;
+    padding: .25em;
+    font-size: 1.25rem;
+    margin: 0em .75em;
+}
+
+#insurance-yes-btn {
+    left: 30%;
+}
+
+#insurance-no-btn {
+    left: 50%;
+}
+
 .cards-container {
     width: 100vw;
     position: absolute;

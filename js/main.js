@@ -18,6 +18,7 @@ let dealerTurn = false; //It's used to know if the popped card should go to the 
 let tempCardSrc = '';
 let playerBet = 0;
 let confirmedBet = 0;
+let insuranceAmount = 0;
 
 function shuffleDeck() {
     deck.push("ac");
@@ -65,6 +66,7 @@ class Player {
         this.cash = cash;
         this.hand = 0;
         this.isSoft = false;
+        this.hasInsurance = false;
     }
 
     async hit() {
@@ -123,11 +125,13 @@ class Player {
             }
             //Check if player is busted
             else {
-                document.getElementById('hidden').src = tempCardSrc;
                 playerHitBtn.disabled = true;
                 playerHitBtn.style.cursor = 'default';
                 playerStandBtn.disabled = true;
                 playerStandBtn.style.cursor = 'default';
+                await sleep(2000);
+                document.getElementById('hidden').src = tempCardSrc;
+                hitCardSound.play();
             }
             //Code to go to the next round
         }
@@ -142,6 +146,14 @@ class Player {
             playerStandBtn.style.cursor = 'default';
             setTimeout(dealerPlays, 1000);
         }
+    }
+
+    insurance() {
+        insuranceAmount = confirmedBet / 2;
+        player.cash -= insuranceAmount;
+        player.hasInsurance = true;
+        playerCash.innerHTML = 'Cash: &dollar;' + player.cash;
+        document.getElementById('insurance-container').style.display = 'none';
     }
 }
 
@@ -161,6 +173,7 @@ function newRound() {
     dealerTurn = false;
     player.hand = 0;
     player.isSoft = false;
+    player.hasInsurance = false;
     dealer.hand = 0;
     dealer.isSoft = false;
 
@@ -208,6 +221,7 @@ function confirmBet() {
         playerCash.innerHTML = 'Cash: &dollar;' + player.cash;
         //If tempBet is less or equal than the total cash amount of the player, hide betting container, give hands and show actions container
         bettingContainer.style.display = 'none';
+        buttonContainer.style.visibility = 'hidden';
         setTimeout(giveHand, 500, player);
         setTimeout(giveHand, 1250, dealer);
         buttonContainer.style.display = 'flex'
@@ -268,10 +282,21 @@ async function giveHand(_player) {
             newCardElement.src = './images/back.png';
         }
         hitCardSound.play();
-        await sleep(2000);
+
+        //Ask if player wants insurance
+        if (i==0 && _player.name=='dealer' && newCardValue=='a' && player.cash>=confirmedBet/2) {
+            document.getElementById('insurance-container').style.display = 'block';
+        }
+
+        await sleep(500);
+
+        if (i==1 && _player.name=='dealer') {
+            buttonContainer.style.visibility = 'visible';
+        }
+
+        await sleep(1000);
     }
 
-    console.log(player.hand + " " + dealer.hand);
     //Check if player got a blackjack
     if (_player.name == 'dealer') {
         if (player.hand==21) {
@@ -287,12 +312,20 @@ async function giveHand(_player) {
             //Check if dealer has BJ too and add the corresponding cash on player's cash after
             if (dealer.hand==21) {
                 player.cash += confirmedBet;
+                playerCash.innerHTML = 'Cash: &dollar;' + player.cash;
             }
             else {
                 player.cash += (confirmedBet*2 + (confirmedBet/2));
+                playerCash.innerHTML = 'Cash: &dollar;' + player.cash;
             }
             //Code to go to the next round
         }
+    }
+
+    //Check if dealer got a blackjack and player had insurance
+    if (dealer.hand==21 && player.hasInsurance==true) {
+        player.cash += insuranceAmount*2;
+        playerCash.innerHTML = 'Cash: &dollar;' + player.cash;
     }
 }
 
@@ -315,6 +348,10 @@ async function dealerPlays() {
         player.cash += confirmedBet;
         playerCash.innerHTML = 'Cash: &dollar;' + player.cash;
     }
+}
+
+function hideInsurance() {
+    document.getElementById('insurance-container').style.display = 'none';
 }
 
 shuffleDeck(); //Initialize the deck for the first time
