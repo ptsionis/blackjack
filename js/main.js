@@ -121,14 +121,11 @@ class Player {
             //Check if dealer is busted
             if (this.name=='dealer') {
                 player.cash += confirmedBet * 2;
-                playerCash.innerHTML = 'Cash: &dollar;' + player.cash;
+                updateCashDisplay();
             }
             //Check if player is busted
             else {
-                playerHitBtn.disabled = true;
-                playerHitBtn.style.cursor = 'default';
-                playerStandBtn.disabled = true;
-                playerStandBtn.style.cursor = 'default';
+                disableActionButtons();
                 await sleep(2000);
                 document.getElementById('hidden').src = tempCardSrc;
                 hitCardSound.play();
@@ -140,10 +137,7 @@ class Player {
     stand() {
         //If player pressed Stand, disable action buttons and let dealer play
         if (this.name!='dealer') {
-            playerHitBtn.disabled = true;
-            playerHitBtn.style.cursor = 'default';
-            playerStandBtn.disabled = true;
-            playerStandBtn.style.cursor = 'default';
+            disableActionButtons();
             setTimeout(dealerPlays, 1000);
         }
     }
@@ -152,8 +146,9 @@ class Player {
         insuranceAmount = confirmedBet / 2;
         player.cash -= insuranceAmount;
         player.hasInsurance = true;
-        playerCash.innerHTML = 'Cash: &dollar;' + player.cash;
+        updateCashDisplay();
         document.getElementById('insurance-container').style.display = 'none';
+        buttonContainer.style.visibility = 'visible';
     }
 }
 
@@ -187,10 +182,7 @@ function newRound() {
     buttonContainer.style.display = 'none';
 
     //Make Hit, Stand, Double buttons clickable
-    playerHitBtn.disabled = false;
-    playerHitBtn.style.cursor = 'pointer';
-    playerStandBtn.disabled = false;
-    playerStandBtn.style.cursor = 'pointer';
+    enableActionButtons();
 }
 
 function addBet(_this) {
@@ -218,8 +210,7 @@ function confirmBet() {
     if (player.cash >= playerBet) {
         player.cash -= playerBet;
         confirmedBet = playerBet;
-        playerCash.innerHTML = 'Cash: &dollar;' + player.cash;
-        //If tempBet is less or equal than the total cash amount of the player, hide betting container, give hands and show actions container
+        updateCashDisplay();
         bettingContainer.style.display = 'none';
         buttonContainer.style.visibility = 'hidden';
         setTimeout(giveHand, 500, player);
@@ -290,7 +281,7 @@ async function giveHand(_player) {
 
         await sleep(500);
 
-        if (i==1 && _player.name=='dealer') {
+        if (i==1 && _player.name=='dealer' && document.getElementById('insurance-container').style.display!='block') {
             buttonContainer.style.visibility = 'visible';
         }
 
@@ -301,10 +292,7 @@ async function giveHand(_player) {
     if (_player.name == 'dealer') {
         if (player.hand==21) {
             //If player got a BJ, disable action buttons, show dealer's second card
-            playerHitBtn.disabled = true;
-            playerHitBtn.style.cursor = 'default';
-            playerStandBtn.disabled = true;
-            playerStandBtn.style.cursor = 'pointer';
+            disableActionButtons();
             await sleep(2000);
             document.getElementById('hidden').src = tempCardSrc;
             hitCardSound.play();
@@ -312,20 +300,15 @@ async function giveHand(_player) {
             //Check if dealer has BJ too and add the corresponding cash on player's cash after
             if (dealer.hand==21) {
                 player.cash += confirmedBet;
-                playerCash.innerHTML = 'Cash: &dollar;' + player.cash;
+                payInsurance();
+                updateCashDisplay();
             }
             else {
                 player.cash += (confirmedBet*2 + (confirmedBet/2));
-                playerCash.innerHTML = 'Cash: &dollar;' + player.cash;
+                updateCashDisplay();
             }
             //Code to go to the next round
         }
-    }
-
-    //Check if dealer got a blackjack and player had insurance
-    if (dealer.hand==21 && player.hasInsurance==true) {
-        player.cash += insuranceAmount*2;
-        playerCash.innerHTML = 'Cash: &dollar;' + player.cash;
     }
 }
 
@@ -339,19 +322,49 @@ async function dealerPlays() {
         dealer.hit();
     }
     
-    //Check if player's hand is bigger than dealer's hand
+    //Check if player's hand is bigger than or equal to dealer's hand
     if (player.hand > dealer.hand) {
         player.cash += confirmedBet * 2;
-        playerCash.innerHTML = 'Cash: &dollar;' + player.cash;
+        updateCashDisplay();
     }
     if (player.hand == dealer.hand) {
         player.cash += confirmedBet;
-        playerCash.innerHTML = 'Cash: &dollar;' + player.cash;
+        updateCashDisplay();
     }
+
+    //If player had an insurance and dealer got a BJ, pay the insurance
+    payInsurance();
 }
 
 function hideInsurance() {
     document.getElementById('insurance-container').style.display = 'none';
+    buttonContainer.style.visibility = 'visible';
+}
+
+function payInsurance() {
+    //Check if dealer got a blackjack and player had insurance
+    if (dealer.hand==21 && player.hasInsurance==true) {
+        player.cash += insuranceAmount*2;
+        updateCashDisplay();
+    }
+}
+
+function updateCashDisplay() {
+    playerCash.innerHTML = 'Cash: &dollar;' + player.cash;
+}
+
+function enableActionButtons() {
+    playerHitBtn.disabled = false;
+    playerHitBtn.style.cursor = 'pointer';
+    playerStandBtn.disabled = false;
+    playerStandBtn.style.cursor = 'pointer';
+}
+
+function disableActionButtons() {
+    playerHitBtn.disabled = true;
+    playerHitBtn.style.cursor = 'default';
+    playerStandBtn.disabled = true;
+    playerStandBtn.style.cursor = 'default';
 }
 
 shuffleDeck(); //Initialize the deck for the first time
