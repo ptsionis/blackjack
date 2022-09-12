@@ -19,6 +19,9 @@ let tempCardSrc = '';
 let playerBet = 0;
 let confirmedBet = 0;
 let insuranceAmount = 0;
+/*Used to count how many cards dealer has. Helps to fix a bug when player bought insurance,
+dealer did not have a blackjack but if his cards>2 and his hand==21, insurance was paid*/
+let dealerCards = 2;
 
 function shuffleDeck() {
     deck.push("ac");
@@ -121,7 +124,7 @@ class Player {
 
             if (this.hand > 21) {
                 //Check if dealer is busted
-                if (this.name=='dealer') {
+                if (this.name=='dealer' && player.hand<=21) {
                     player.cash += confirmedBet * 2;
                     updateCashDisplay();
                 }
@@ -129,8 +132,10 @@ class Player {
                 else {
                     disableActionButtons();
                     await sleep(2000);
-                    document.getElementById('hidden').src = tempCardSrc;
-                    hitCardSound.play();
+                    if (!player.hasDouble) {
+                        document.getElementById('hidden').src = tempCardSrc;
+                        hitCardSound.play();
+                    }
                 }
                 //Code to go to the next round
             }
@@ -139,7 +144,6 @@ class Player {
         if (player.hasDouble) {
             await sleep(500);
             player.stand();
-            player.hasDouble = false;
         }
     }
 
@@ -157,9 +161,7 @@ class Player {
             confirmedBet *= 2;
             player.hasDouble = true;
             player.hit();
-            if (player.hand!=21) { //In hit method, player will stand immediately if player's hand is equal to 21
-                player.stand();
-            }
+            player.hasDouble = false;
         }
         else {
             //Not enough cash message
@@ -196,6 +198,7 @@ function newRound() {
     player.hasDouble = false;
     dealer.hand = 0;
     dealer.isSoft = false;
+    dealerCards = 2;
 
     updateCashDisplay();
 
@@ -313,7 +316,7 @@ async function giveHand(_player) {
             buttonContainer.style.visibility = 'visible';
         }
 
-        await sleep(1000);
+        await sleep(800);
     }
 
     //Check if player got a blackjack
@@ -345,13 +348,14 @@ async function dealerPlays() {
     document.getElementById('hidden').src = tempCardSrc;
     hitCardSound.play();
 
-    while (dealer.hand<17) {
+    while (dealer.hand<17 && player.hand<=21) {
         await sleep(2000);
         dealer.hit();
+        dealerCards++;
     }
     
     //Check if player's hand is bigger than or equal to dealer's hand
-    if (player.hand > dealer.hand) {
+    if (player.hand > dealer.hand && player.hand<=21) {
         player.cash += confirmedBet * 2;
         updateCashDisplay();
     }
@@ -371,7 +375,7 @@ function hideInsurance() {
 
 function payInsurance() {
     //Check if dealer got a blackjack and player had insurance
-    if (dealer.hand==21 && player.hasInsurance==true) {
+    if (dealer.hand==21 && dealerCards==2 && player.hasInsurance==true) {
         player.cash += insuranceAmount*2;
         updateCashDisplay();
     }
