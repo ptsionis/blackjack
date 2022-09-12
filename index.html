@@ -24,7 +24,7 @@
     </div>
     <div class="player-actions-container">
         <div id="betting-container">
-            <p id="player-cash">Cash: &dollar;1000</p>
+            <p id="player-cash">&dollar;1000</p>
             <div class="tokens-container">
                 <img class="token-image" id="token50" src="./images/tokens/50.png" alt="50" onclick="addBet(this)">
                 <img class="token-image" id="token100" src="./images/tokens/100.png" alt="100" onclick="addBet(this)">
@@ -33,17 +33,17 @@
                 <img class="token-image" id="token1000" src="./images/tokens/1000.png" alt="1000" onclick="addBet(this)">
             </div>
             <div class="bet-buttons">
-                <p id="player-bet">Bet: &dollar;0</p>
-                <button class="bet-button" onclick="confirmBet()">Bet</button>
-                <button class="bet-button" onclick="clearBet()">Clear</button>
+                <p id="player-bet">&dollar;0</p>
+                <button class="bet-button" id="bet" onclick="confirmBet()"></button>
+                <button class="bet-button" id="clear-bet" onclick="clearBet()"></button>
             </div>
         </div>
         <div id="button-container">
-            <button type="button" class="action-button" id="playerHitBtn" onclick="player.hit()">Hit</button>
-            <button type="button" class="action-button" id="playerStandBtn" onclick="player.stand()">Stand</button>
-            <button type="button" class="action-button" id="playerDoubleBtn" onclick="player.double()">Double</button>
-            <button type="button" class="action-button" id="playerSplitBtn" onclick="player.split()">Split</button>
-            <button type="button" class="action-button" onclick="newRound()">New Round</button>
+            <button type="button" class="action-button" id="playerHitBtn" onclick="player.hit()"></button>
+            <button type="button" class="action-button" id="playerStandBtn" onclick="player.stand()"></button>
+            <button type="button" class="action-button" id="playerDoubleBtn" onclick="player.double()"></button>
+            <button type="button" class="action-button" id="playerSplitBtn" onclick="player.split()"></button>
+            <button type="button" class="action-button" onclick="newRound()">New</button>
         </div>
     </div>
     <script src="./js/main.js"></script>

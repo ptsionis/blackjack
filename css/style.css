@@ -53,6 +53,17 @@ body {
     left: 50%;
 }
 
+#end-message {
+    display: none;
+    font-size: 1.5rem;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 4;
+    padding: 1em;
+}
+
 .cards-container {
     width: 100vw;
     position: absolute;
@@ -94,7 +105,8 @@ body {
 }
 
 #player-cash {
-    margin: 1em 0em;
+    margin: 1em 0em 3em 0em;
+    padding: 0em 2em;
 }
 
 #player-bet {
@@ -102,12 +114,56 @@ body {
     text-align: center;
 }
 
+#player-cash, #player-bet, #end-message {
+    border-radius: 20px;
+    background-color: rgb(10, 10, 10);
+    color: rgb(5, 180, 5);
+    box-shadow: 3px 1px 5px 2px rgba(0,0,0,.75);
+}
+
 .bet-button, .action-button {
     cursor: pointer;
     margin: 0em 1em;
-    width: 150px;
+    width: 75px;
+    height: 75px;
     padding: .5em;
     font-size: 1.5rem;
+    border-radius: 50px;
+    transition: all .2s ease;
+}
+
+.bet-button:hover, .action-button:hover, .token-image:hover {
+    transform: scale(1.05);
+}
+
+#bet {
+    background: url('../images/bet.png');
+    background-position: center;
+    background-size: cover;
+}
+
+#clear-bet {
+    background: url('../images/clearbet.png');
+    background-position: center;
+    background-size: cover;
+}
+
+#playerHitBtn {
+    background: url('../images/hit.png');
+    background-position: center;
+    background-size: cover;
+}
+
+#playerStandBtn {
+    background: url('../images/stand.png');
+    background-position: center;
+    background-size: cover;
+}
+
+#playerDoubleBtn {
+    background: url('../images/double.png');
+    background-position: center;
+    background-size: cover;
 }
 
 #playerSplitBtn {
@@ -116,7 +172,7 @@ body {
 
 #button-container {
     position: absolute;
-    bottom: 10%;
+    bottom: 5%;
     display: none;
     justify-content: center;
     width: 100%;
@@ -124,6 +180,7 @@ body {
 
 .tokens-container {
     height: fit-content;
+    margin-bottom: 1em;
 }
 
 .token-image {
@@ -131,7 +188,8 @@ body {
     height: auto;
     margin: 0em .5em;
     cursor: pointer;
-    border: 2px solid rgba(0,0,0,.6);
+    border: 3px solid rgba(0,0,0,.75);
     border-radius: 50px;
     box-shadow: 3px 1px 5px 1px rgba(0,0,0,.6);
+    transition: all .2s ease;
 }

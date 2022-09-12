@@ -10,7 +10,6 @@ const playerStandBtn = document.getElementById('playerStandBtn');
 const playerCash = document.getElementById('player-cash');
 const playerTempBet = document.getElementById('player-bet');
 const addBetSound = document.getElementById('addBetSound');
-const clearBetSound = document.getElementById('clearBetSound');
 const hitCardSound = document.getElementById('hitCardSound');
 const shuffleSound = document.getElementById('shuffleSound');
 
@@ -177,6 +176,8 @@ function newRound() {
         shuffleDeck();
     }
 
+    clearBet();
+
     //Show betting options
     bettingContainer.style.display = 'flex';
     buttonContainer.style.display = 'none';
@@ -202,7 +203,7 @@ function addBet(_this) {
         playerBet += 1000;
     }
     addBetSound.play();
-    playerTempBet.innerHTML = 'Bet: &dollar;' + playerBet;
+    playerTempBet.innerHTML = '&dollar;' + playerBet;
 }
 
 function confirmBet() {
@@ -225,8 +226,7 @@ function confirmBet() {
 function clearBet() {
     //Reset tempBet
     playerBet = 0;
-    playerTempBet.innerHTML = 'Bet: &dollar;0'
-    clearBetSound.play();
+    playerTempBet.innerHTML = '&dollar;0'
 }
 
 async function giveHand(_player) {
@@ -350,7 +350,7 @@ function payInsurance() {
 }
 
 function updateCashDisplay() {
-    playerCash.innerHTML = 'Cash: &dollar;' + player.cash;
+    playerCash.innerHTML = '&dollar;' + player.cash;
 }
 
 function enableActionButtons() {
