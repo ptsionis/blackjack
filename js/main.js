@@ -7,6 +7,7 @@ const bettingContainer = document.getElementById('betting-container');
 const buttonContainer = document.getElementById('button-container');
 const playerHitBtn = document.getElementById('playerHitBtn');
 const playerStandBtn = document.getElementById('playerStandBtn');
+const playerDoubleBtn = document.getElementById('playerDoubleBtn');
 const playerCash = document.getElementById('player-cash');
 const playerTempBet = document.getElementById('player-bet');
 const addBetSound = document.getElementById('addBetSound');
@@ -66,6 +67,7 @@ class Player {
         this.hand = 0;
         this.isSoft = false;
         this.hasInsurance = false;
+        this.hasDouble = false;
     }
 
     async hit() {
@@ -111,25 +113,33 @@ class Player {
             this.isSoft = false;
         }
 
-        //Check if player reached 21
-        if (this.hand == 21) {
-            this.stand();
-        }
+        if (!player.hasDouble) {
+            //Check if player reached 21
+            if (this.hand == 21) {
+                this.stand();
+            }
 
-        if (this.hand > 21) {
-            //Check if dealer is busted
-            if (this.name=='dealer') {
-                player.cash += confirmedBet * 2;
-                updateCashDisplay();
+            if (this.hand > 21) {
+                //Check if dealer is busted
+                if (this.name=='dealer') {
+                    player.cash += confirmedBet * 2;
+                    updateCashDisplay();
+                }
+                //Check if player is busted
+                else {
+                    disableActionButtons();
+                    await sleep(2000);
+                    document.getElementById('hidden').src = tempCardSrc;
+                    hitCardSound.play();
+                }
+                //Code to go to the next round
             }
-            //Check if player is busted
-            else {
-                disableActionButtons();
-                await sleep(2000);
-                document.getElementById('hidden').src = tempCardSrc;
-                hitCardSound.play();
-            }
-            //Code to go to the next round
+        }
+        
+        if (player.hasDouble) {
+            await sleep(500);
+            player.stand();
+            player.hasDouble = false;
         }
     }
 
@@ -138,6 +148,21 @@ class Player {
         if (this.name!='dealer') {
             disableActionButtons();
             setTimeout(dealerPlays, 1000);
+        }
+    }
+
+    double() {
+        if (player.cash>=confirmedBet) {
+            player.cash -= confirmedBet;
+            confirmedBet *= 2;
+            player.hasDouble = true;
+            player.hit();
+            if (player.hand!=21) { //In hit method, player will stand immediately if player's hand is equal to 21
+                player.stand();
+            }
+        }
+        else {
+            //Not enough cash message
         }
     }
 
@@ -168,8 +193,11 @@ function newRound() {
     player.hand = 0;
     player.isSoft = false;
     player.hasInsurance = false;
+    player.hasDouble = false;
     dealer.hand = 0;
     dealer.isSoft = false;
+
+    updateCashDisplay();
 
     //If deck length is less than 4, shuffle
     if (deck.length<4) {
@@ -358,6 +386,8 @@ function enableActionButtons() {
     playerHitBtn.style.cursor = 'pointer';
     playerStandBtn.disabled = false;
     playerStandBtn.style.cursor = 'pointer';
+    playerDoubleBtn.disabled = false;
+    playerDoubleBtn.style.cursor = 'pointer';
 }
 
 function disableActionButtons() {
@@ -365,6 +395,8 @@ function disableActionButtons() {
     playerHitBtn.style.cursor = 'default';
     playerStandBtn.disabled = true;
     playerStandBtn.style.cursor = 'default';
+    playerDoubleBtn.disabled = true;
+    playerDoubleBtn.style.cursor = 'default';
 }
 
 shuffleDeck(); //Initialize the deck for the first time
