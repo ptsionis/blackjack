@@ -19,9 +19,6 @@ let tempCardSrc = '';
 let playerBet = 0;
 let confirmedBet = 0;
 let insuranceAmount = 0;
-/*Used to count how many cards dealer has. Helps to fix a bug when player bought insurance,
-dealer did not have a blackjack but if his cards>2 and his hand==21, insurance was paid*/
-let dealerCards = 2;
 
 function shuffleDeck() {
     deck.push("ac");
@@ -68,12 +65,18 @@ class Player {
         this.name = name;
         this.cash = cash;
         this.hand = 0;
+        this.cardCounter = 2;
         this.isSoft = false;
         this.hasInsurance = false;
         this.hasDouble = false;
     }
 
     async hit() {
+        this.cardCounter++;
+        if (this.name=='demo' && player.cardCounter>2) {
+            playerDoubleBtn.style.display = 'none';
+        }
+
         //If deck is empty, reshuffle it
         if (deck.length == 0) {
             shuffleDeck();
@@ -193,12 +196,13 @@ function newRound() {
     //Set both hands to zero and isSoft to false
     dealerTurn = false;
     player.hand = 0;
+    player.cardCounter = 2;
     player.isSoft = false;
     player.hasInsurance = false;
     player.hasDouble = false;
     dealer.hand = 0;
+    dealer.cardCounter = 2;
     dealer.isSoft = false;
-    dealerCards = 2;
 
     updateCashDisplay();
 
@@ -212,6 +216,7 @@ function newRound() {
     //Show betting options
     bettingContainer.style.display = 'flex';
     buttonContainer.style.display = 'none';
+    playerDoubleBtn.style.display = 'block'
 
     //Make Hit, Stand, Double buttons clickable
     enableActionButtons();
