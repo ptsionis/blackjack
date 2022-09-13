@@ -148,6 +148,8 @@ class Player {
             await sleep(500);
             player.stand();
         }
+
+        console.log(this.name + " hand: " + this.hand);
     }
 
     stand() {
@@ -204,14 +206,13 @@ function newRound() {
     dealer.cardCounter = 2;
     dealer.isSoft = false;
 
+    clearBet();
     updateCashDisplay();
 
     //If deck length is less than 4, shuffle
     if (deck.length<4) {
         shuffleDeck();
     }
-
-    clearBet();
 
     //Show betting options
     bettingContainer.style.display = 'flex';
@@ -356,7 +357,7 @@ async function dealerPlays() {
     while (dealer.hand<17 && player.hand<=21) {
         await sleep(2000);
         dealer.hit();
-        dealerCards++;
+        dealer.cardCounter++;
     }
     
     //Check if player's hand is bigger than or equal to dealer's hand
