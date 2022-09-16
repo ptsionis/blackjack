@@ -1,0 +1,54 @@
+@media screen and (max-width: 600px) {
+    #credit-intro {
+        width: 350px;
+        height: auto;
+    }
+
+    #blackjack-intro {
+        width: 200px;
+        height: auto;
+    }
+
+    #text-intro {
+        width: 250px;
+        height: auto;
+    }
+
+    #insurance-container {
+        width: 250px;
+        height: 250px;
+        background-size: contain;
+        background-position-y: 60%;
+    }
+
+    #insurance-yes-btn {
+        left: 12.5%;
+    }
+
+    .tokens-container {
+        display: grid;
+        grid-template-columns: auto auto auto;
+        row-gap: 25px;
+    }
+
+    .token-image {
+        margin: 0em .2em;
+    }
+
+    #token500, #token1000 {
+        margin-left: 55%;
+    }
+
+    #newRound {
+        display: none;
+    }
+
+    #dealerHand, #playerHand {
+        display: grid;
+        grid-template-columns: auto auto auto;
+    }
+
+    .card {
+        height: 160px;
+    }
+}

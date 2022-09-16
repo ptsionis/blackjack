@@ -1,5 +1,6 @@
 'use strict';
 
+const introScreen = document.getElementById('intro');
 const deck = [];
 const playerHand = document.getElementById('playerHand');
 const dealerHand = document.getElementById('dealerHand');
@@ -74,7 +75,8 @@ class Player {
     async hit() {
         this.cardCounter++;
         if (this.name=='demo' && player.cardCounter>2) {
-            playerDoubleBtn.style.display = 'none';
+            playerDoubleBtn.disabled = true;
+            playerDoubleBtn.style.cursor = 'default';
         }
 
         //If deck is empty, reshuffle it
@@ -139,6 +141,8 @@ class Player {
                         document.getElementById('hidden').src = tempCardSrc;
                         hitCardSound.play();
                     }
+                    await sleep(4500);
+                    newRound();
                 }
                 //Code to go to the next round
             }
@@ -148,8 +152,6 @@ class Player {
             await sleep(500);
             player.stand();
         }
-
-        console.log(this.name + " hand: " + this.hand + this.name + " card counter: " + this.cardCounter);
     }
 
     stand() {
@@ -217,7 +219,8 @@ function newRound() {
     //Show betting options
     bettingContainer.style.display = 'flex';
     buttonContainer.style.display = 'none';
-    playerDoubleBtn.style.display = 'block'
+    playerDoubleBtn.disabled = false;
+    playerDoubleBtn.style.cursor = 'pointer';
 
     //Make Hit, Stand, Double buttons clickable
     enableActionButtons();
@@ -322,7 +325,7 @@ async function giveHand(_player) {
             buttonContainer.style.visibility = 'visible';
         }
 
-        await sleep(800);
+        await sleep(1000);
     }
 
     //Check if player got a blackjack
@@ -338,13 +341,12 @@ async function giveHand(_player) {
             if (dealer.hand==21) {
                 player.cash += confirmedBet;
                 payInsurance();
-                updateCashDisplay();
             }
             else {
                 player.cash += (confirmedBet*2 + (confirmedBet/2));
-                updateCashDisplay();
             }
-            //Code to go to the next round
+            await sleep(4500);
+            newRound();
         }
     }
 }
@@ -358,19 +360,25 @@ async function dealerPlays() {
         await sleep(2000);
         dealer.hit();
     }
+
+    //If player had an insurance and dealer got a BJ, pay the insurance
+    payInsurance();
     
     //Check if player's hand is bigger than or equal to dealer's hand
     if (player.hand > dealer.hand && player.hand<=21) {
         player.cash += confirmedBet * 2;
-        updateCashDisplay();
+        await sleep(4500);
+        newRound();
     }
     if (player.hand == dealer.hand) {
         player.cash += confirmedBet;
-        updateCashDisplay();
+        await sleep(4500);
+        newRound();
     }
-
-    //If player had an insurance and dealer got a BJ, pay the insurance
-    payInsurance();
+    if (dealer.hand > player.hand) {
+        await sleep(4500);
+        newRound();
+    }
 }
 
 function hideInsurance() {
@@ -408,5 +416,17 @@ function disableActionButtons() {
     playerDoubleBtn.style.cursor = 'default';
 }
 
-shuffleDeck(); //Initialize the deck for the first time
-newRound(); //Set everything up for the first time
+async function intro() {
+    bettingContainer.style.display = 'none';
+    buttonContainer.style.display = 'none';
+}
+
+async function start() {
+    introScreen.style.top = '-100%';
+    await sleep(2000);
+    introScreen.style.display = 'none';
+    shuffleDeck(); //Initialize the deck for the first time
+    newRound(); //Set everything up for the first time
+}
+
+intro();

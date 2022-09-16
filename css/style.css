@@ -16,6 +16,64 @@ body {
     font-family: 'Noto Serif Georgian', serif;
 }
 
+#intro {
+    height: 100vh;
+    width: 100vw;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transition: all 2s ease;
+}
+
+#credit-intro {
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation-name: 'intro';
+    animation-duration: 3s;
+}
+
+#blackjack-intro {
+    position: absolute;
+    top: 45%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation-name: 'intro';
+    animation-duration: 2s;
+}
+
+#text-intro {
+    position: absolute;
+    top: 70%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation-name: 'intro';
+    animation-duration: 3s;
+}
+
+#intro-btn {
+    cursor: pointer;
+    font-size: 1.5rem;
+    padding: .5em 1em .5em 1em;
+    position: absolute;
+    top: 85%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation-name: 'intro';
+    animation-duration: 3s;
+}
+
+@keyframes intro {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
 #insurance-container {
     display: none;
     position: absolute;

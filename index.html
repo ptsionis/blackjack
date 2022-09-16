@@ -6,8 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>21 BlackJack</title>
     <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/media.css">
 </head>
 <body>
+    <div id="intro">
+        <img src="./images/intro/credit-intro.png" id="credit-intro">
+        <img src="./images/intro/blackjack-intro.png" id="blackjack-intro">
+        <img src="./images/intro/text-intro.png" id="text-intro">
+        <button type="button" id="intro-btn" onclick="start()">Start!</button>
+    </div>
     <audio src="./sounds/shuffleSound.mp3" type="audio/mpeg" id="shuffleSound"></audio>
     <audio src="./sounds/hitCardSound.mp3" type="audio/mpeg" id="hitCardSound"></audio>
     <audio src="./sounds/addBetSound.mp3" type="audio/mpeg" id="addBetSound"></audio>
@@ -43,7 +50,6 @@
             <button type="button" class="action-button" id="playerStandBtn" onclick="player.stand()"></button>
             <button type="button" class="action-button" id="playerDoubleBtn" onclick="player.double()"></button>
             <button type="button" class="action-button" id="playerSplitBtn" onclick="player.split()"></button>
-            <button type="button" class="action-button" onclick="newRound()">New</button>
         </div>
     </div>
     <script src="./js/main.js"></script>
