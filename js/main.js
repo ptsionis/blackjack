@@ -319,13 +319,11 @@ async function giveHand(_player) {
             document.getElementById('insurance-container').style.display = 'block';
         }
 
-        await sleep(500);
-
         if (i==1 && _player.name=='dealer' && document.getElementById('insurance-container').style.display!='block') {
             buttonContainer.style.visibility = 'visible';
         }
 
-        await sleep(1000);
+        await sleep(1500);
     }
 
     //Check if player got a blackjack
@@ -333,7 +331,6 @@ async function giveHand(_player) {
         if (player.hand==21) {
             //If player got a BJ, disable action buttons, show dealer's second card
             disableActionButtons();
-            await sleep(2000);
             document.getElementById('hidden').src = tempCardSrc;
             hitCardSound.play();
 
@@ -388,7 +385,7 @@ function hideInsurance() {
 
 function payInsurance() {
     //Check if dealer got a blackjack and player had insurance
-    if (dealer.hand==21 && dealerCards==2 && player.hasInsurance==true) {
+    if (dealer.hand==21 && dealer.cardCounter==2 && player.hasInsurance==true) {
         player.cash += insuranceAmount*2;
         updateCashDisplay();
     }
