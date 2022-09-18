@@ -56,13 +56,6 @@ function shuffleDeck() {
     }
 
     shuffleSound.play();
-
-    deck[deck.length-1] = 'ks';
-    deck[deck.length-2] = 'qs';
-    deck[deck.length-3] = '9s';
-    deck[deck.length-4] = '3s';
-    deck[deck.length-5] = 'ah';
-    deck[deck.length-6] = '6c';
 }
 
 async function sleep(ms) {
@@ -81,7 +74,6 @@ class Player {
     }
 
     async hit() {
-        console.log("HIT IS RUNNING");
         this.cardCounter++;
         if (this.name=='demo' && player.cardCounter>2) {
             playerDoubleBtn.disabled = true;
@@ -164,7 +156,6 @@ class Player {
     }
 
     stand() {
-        console.log("STAND IS RUNNING");
         //If player pressed Stand, disable action buttons and let dealer play
         if (this.name!='dealer') {
             disableActionButtons();
@@ -234,8 +225,6 @@ function newRound() {
 
     //Make Hit, Stand, Double buttons clickable
     enableActionButtons();
-
-    console.log(player.cash);
 }
 
 function addBet(_this) {
@@ -379,7 +368,7 @@ async function dealerPlays() {
         await sleep(4500);
         newRound();
     }
-    if (player.hand == dealer.hand) {
+    if (player.hand == dealer.hand && dealerTurn) {
         player.cash += confirmedBet;
         await sleep(4500);
         newRound();
