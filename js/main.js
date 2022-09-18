@@ -1,7 +1,8 @@
-'use strict';
+"use strict";
 
+//All the DOM elements that will be used
 const introScreen = document.getElementById('intro');
-const deck = [];
+const popUpMessage = document.getElementById('popup-message');
 const playerHand = document.getElementById('playerHand');
 const dealerHand = document.getElementById('dealerHand');
 const bettingContainer = document.getElementById('betting-container');
@@ -16,13 +17,16 @@ const addBetSound = document.getElementById('addBetSound');
 const hitCardSound = document.getElementById('hitCardSound');
 const shuffleSound = document.getElementById('shuffleSound');
 
-let dealerTurn = false; //It's used to know if the popped card should go to the player or the dealer DOM container
+const deck = [];
+let dealerTurn = false;
 let tempCardSrc = '';
 let playerBet = 0;
 let confirmedBet = 0;
 let insuranceAmount = 0;
 
-function shuffleDeck() {
+//Used to shuffle the deck when needed
+async function shuffleDeck() {
+    //Initialize the cards
     deck.push("ac");
     deck.push("ad");
     deck.push("ah");
@@ -50,12 +54,18 @@ function shuffleDeck() {
     deck.push("kh");
     deck.push("ks");
 
+    //Shuffle the cards
     for (let i=deck.length-1; i>0; i--) {
         const j = Math.floor(Math.random() * (i+1));
         [deck[i], deck[j]] = [deck[j], deck[i]];
     }
 
+    //Shuffle pop-up message
+    popUpMessage.innerHTML = 'Shuffling...';
+    popUpMessage.style.display = 'block';
     shuffleSound.play();
+    await sleep(2000);
+    popUpMessage.style.display = 'none';
 }
 
 async function sleep(ms) {
@@ -75,7 +85,8 @@ class Player {
 
     async hit() {
         this.cardCounter++;
-        if (this.name=='demo' && player.cardCounter>2) {
+        //Disable the Double option if the player chose to hit
+        if (this.name=='player' && player.cardCounter>2) {
             playerDoubleBtn.disabled = true;
             playerDoubleBtn.style.cursor = 'default';
         }
@@ -145,10 +156,10 @@ class Player {
                     await sleep(4500);
                     newRound();
                 }
-                //Code to go to the next round
             }
         }
         
+        //This code will run only when player.hit() was called from player.double() and player.hasDouble == true
         if (player.hasDouble) {
             await sleep(500);
             player.stand();
@@ -163,7 +174,8 @@ class Player {
         }
     }
 
-    double() {
+    async double() {
+        //If player doubles and has enough cash, bet will double, player will hit once, and hit method will auto stand, since hasDouble will be true
         if (player.cash>=confirmedBet) {
             player.cash -= confirmedBet;
             confirmedBet *= 2;
@@ -171,22 +183,26 @@ class Player {
             player.hit();
             player.hasDouble = false;
         }
+        //If players doubles and has not enough cash, nothing will happen and a message will appear
         else {
-            //Not enough cash message
+            popUpMessage.innerHTML = 'Not enough cash...';
+            popUpMessage.style.display = 'block';
+            await sleep(2000);
+            popUpMessage.style.display = 'none'
         }
     }
 
+    //Runs when dealer's first card is Ace (it's called from giveHand)
     insurance() {
         insuranceAmount = confirmedBet / 2;
         player.cash -= insuranceAmount;
         player.hasInsurance = true;
-        updateCashDisplay();
         document.getElementById('insurance-container').style.display = 'none';
         buttonContainer.style.visibility = 'visible';
     }
 }
 
-const player = new Player('demo', 1000);
+const player = new Player('player', 1000);
 const dealer = new Player('dealer', 9999);
 
 function newRound() {
@@ -198,7 +214,7 @@ function newRound() {
         dealerHand.removeChild(dealerHand.firstChild);
     }
 
-    //Set both hands to zero and isSoft to false
+    //Set the turn to player (since dealerTurn becomes false), both hands to zero, card counters to two, isSoft, hasInsuracne and hasDouble to false
     dealerTurn = false;
     player.hand = 0;
     player.cardCounter = 2;
@@ -209,6 +225,7 @@ function newRound() {
     dealer.cardCounter = 2;
     dealer.isSoft = false;
 
+    //Clears the bet from previous round and updates cash display
     clearBet();
     updateCashDisplay();
 
@@ -227,6 +244,7 @@ function newRound() {
     enableActionButtons();
 }
 
+//Runs when player clicks on a token
 function addBet(_this) {
     if (_this.id=='token50') {
         playerBet += 50;
@@ -247,7 +265,7 @@ function addBet(_this) {
     playerTempBet.innerHTML = '&dollar;' + playerBet;
 }
 
-function confirmBet() {
+async function confirmBet() {
     //Check if tempBet is less or equal than the total cash amount of the player
     if (player.cash >= playerBet) {
         player.cash -= playerBet;
@@ -257,21 +275,24 @@ function confirmBet() {
         buttonContainer.style.visibility = 'hidden';
         setTimeout(giveHand, 500, player);
         setTimeout(giveHand, 1250, dealer);
-        buttonContainer.style.display = 'flex'
+        buttonContainer.style.display = 'flex';
     }
     else {
-        //Add code that says 'Cash not enough' in the DOM
+        popUpMessage.innerHTML = 'Not enough cash...';
+        popUpMessage.style.display = 'block';
+        await sleep(2000);
+        popUpMessage.style.display = 'none';
     }
 }
 
 function clearBet() {
     //Reset tempBet
     playerBet = 0;
-    playerTempBet.innerHTML = '&dollar;0'
+    playerTempBet.innerHTML = '&dollar;0';
 }
 
 async function giveHand(_player) {
-    let _playerHand;
+    let _playerHand; //Temp variable that 'points' to the hand that is going to pick the next card
     if (_player.name!='dealer') {
         _playerHand = playerHand;
     }
@@ -354,6 +375,7 @@ async function dealerPlays() {
     document.getElementById('hidden').src = tempCardSrc;
     hitCardSound.play();
 
+    //Dealer picks a card while player is not busted and dealer's hand is below 17
     while (dealer.hand<17 && player.hand<=21) {
         await sleep(2000);
         dealer.hit();
@@ -388,7 +410,6 @@ function payInsurance() {
     //Check if dealer got a blackjack and player had insurance
     if (dealer.hand==21 && dealer.cardCounter==2 && player.hasInsurance==true) {
         player.cash += insuranceAmount*2;
-        updateCashDisplay();
     }
 }
 
